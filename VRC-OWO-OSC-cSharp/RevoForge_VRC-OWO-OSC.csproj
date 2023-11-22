@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>RevoForge-VRC-OWO-OSC</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>RevoForge-VRC-OWO-OSC</AssemblyName>
+    <Company>RevoForge</Company>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="OscCore" Version="1.0.5" />
+    <PackageReference Include="OWO" Version="2.3.10" />
+  </ItemGroup>
+
+</Project>
