@@ -84,7 +84,7 @@ class Program
                 {
                     // Handle the received OSC message
                     //Console.WriteLine($"Received OSC Message: {oscMessage.Address}"); //for debug
-                    if (oscMessage.Address.Contains("owo_suit"))
+                    if (oscMessage.Address.Contains("owo_"))
                     {
                         for (int i = 0; i < oscMessage.Count; i++)
                         {
@@ -100,9 +100,19 @@ class Program
                                 }
                                 else if (convertible.GetTypeCode() == TypeCode.Int32)
                                 {
-                                    // Update the Intensity with a Parameter "owo_suit_Intensity"
-                                    intensity = (int)oscMessage[i];
-                                    microSensation = SensationsFactory.Create(frequency, duration, intensity, rampUp, rampDown, 0);
+                                    if (oscMessage.Address.Contains("intensity"))
+                                    {
+                                        // Update the Intensity with a Parameter "owo_Intensity"
+                                        intensity = (int)oscMessage[i];
+                                        microSensation = SensationsFactory.Create(frequency, duration, intensity, rampUp, rampDown, 0);
+                                    }
+                                    if (oscMessage.Address.Contains("frequency"))
+                                    {
+                                        // Update the frequency with a Parameter "owo_frequency"
+                                        frequency = (int)oscMessage[i];
+                                        microSensation = SensationsFactory.Create(frequency, duration, intensity, rampUp, rampDown, 0);
+
+                                    }
                                 }
                             }
                         }
