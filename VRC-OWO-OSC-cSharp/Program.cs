@@ -17,6 +17,8 @@ class Program
     private static int dorsal_R_Int;
     private static int lumbar_L_Int;
     private static int lumbar_R_Int;
+    private static string oldMuscleInfo = "";
+    private static int muscleCounter = 0;
     public static Config config = new();
 
     static void Main()
@@ -31,23 +33,23 @@ class Program
         int intensity = 100;
         float rampUp = 0;
         float rampDown = 0;
-        pectoral_L_Int = config.currentConfig.intensititys.owo_suit_Pectoral_L;
-        pectoral_R_Int = config.currentConfig.intensititys.owo_suit_Pectoral_R;
-        abdominal_L_Int = config.currentConfig.intensititys.owo_suit_Abdominal_L;
-        abdominal_R_Int = config.currentConfig.intensititys.owo_suit_Abdominal_R;
-        arm_L_Int = config.currentConfig.intensititys.owo_suit_Arm_L;
-        arm_R_Int = config.currentConfig.intensititys.owo_suit_Arm_R;
-        dorsal_L_Int = config.currentConfig.intensititys.owo_suit_Dorsal_L;
-        dorsal_R_Int = config.currentConfig.intensititys.owo_suit_Dorsal_R;
-        lumbar_L_Int = config.currentConfig.intensititys.owo_suit_Lumbar_L;
-        lumbar_R_Int = config.currentConfig.intensititys.owo_suit_Lumbar_R;
+        pectoral_L_Int = config.currentConfig.Intensititys.OwoSuitPectoralL;
+        pectoral_R_Int = config.currentConfig.Intensititys.OwoSuitPectoralR;
+        abdominal_L_Int = config.currentConfig.Intensititys.OwoSuitAbdominalL;
+        abdominal_R_Int = config.currentConfig.Intensititys.OwoSuitAbdominalR;
+        arm_L_Int = config.currentConfig.Intensititys.OwoSuitArmL;
+        arm_R_Int = config.currentConfig.Intensititys.OwoSuitArmR;
+        dorsal_L_Int = config.currentConfig.Intensititys.OwoSuitDorsalL;
+        dorsal_R_Int = config.currentConfig.Intensititys.OwoSuitDorsalR;
+        lumbar_L_Int = config.currentConfig.Intensititys.OwoSuitLumbarL;
+        lumbar_R_Int = config.currentConfig.Intensititys.OwoSuitLumbarR;
         int port = config.GetByKey("server_port");
-        string suitIP = config.currentConfig.owo_ip;
+        string suitIP = config.currentConfig.Owo_ip;
         //-------------
 
         Timer sendTimer;
-        bool autoConnect = config.currentConfig.useAutoConnect;
-        bool startUpConnect = config.currentConfig.connectAtStart;
+        bool autoConnect = config.currentConfig.UseAutoConnect;
+        bool startUpConnect = config.currentConfig.ConnectAtStart;
 
         if (startUpConnect)
         {
@@ -74,7 +76,7 @@ class Program
             try
             {
                 // Receive bytes
-                IPEndPoint senderEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                IPEndPoint senderEndPoint = new(IPAddress.Any, 0);
                 byte[] receivedBytes = udpClient.Receive(ref senderEndPoint);
 
                 // Parse the received OSC message using OscCore
@@ -100,23 +102,19 @@ class Program
                                 }
                                 else if (convertible.GetTypeCode() == TypeCode.Single)
                                 {
-                                    if (oscMessage.Address.Contains("intensity"))
-                                    {
-                                        // Update the Intensity with a Parameter "owo_Intensity"
+                                    string address = oscMessage.Address.ToLower();
 
-                                        float intensityF = (float)oscMessage[i];
-                                        intensityF *= 100;
-                                        intensity = (int)intensityF;
-                                        microSensation = SensationsFactory.Create(frequency, duration, intensity, rampUp, rampDown, 0);
-                                    }
-                                    if (oscMessage.Address.Contains("frequency"))
+                                    switch (address)
                                     {
-                                        // Update the frequency with a Parameter "owo_frequency"
-                                        float frequencyF = (float)oscMessage[i];
-                                        frequencyF *= 100;
-                                        frequency = (int)frequencyF;
-                                        microSensation = SensationsFactory.Create(frequency, duration, intensity, rampUp, rampDown, 0);
+                                        case var _ when address.Contains("intensity"):
+                                            UpdateParameter("intensity", (float)oscMessage[i] * 100);
+                                            Console.WriteLine($"\nIntensity Changed to: {intensity}");
+                                            break;
 
+                                        case var _ when address.Contains("frequency"):
+                                            UpdateParameter("frequency", (float)oscMessage[i] * 100);
+                                            Console.WriteLine($"\nFrequency Changed to: {frequency}");
+                                            break;
                                     }
                                 }
                             }
@@ -129,7 +127,24 @@ class Program
                 Console.WriteLine($"Error: {ex.Message}");
             }
         }
+
+        void UpdateParameter(string paramName, float value)
+        {
+            switch (paramName)
+            {
+                case "intensity":
+                    intensity = (int)value;
+                    break;
+
+                case "frequency":
+                    frequency = (int)value;
+                    break;
+            }
+
+            microSensation = SensationsFactory.Create(frequency, duration, intensity, rampUp, rampDown, 0);
+        }
     }
+
     // NEEDS GUI BUTTON for use of !startUpConnect
     static void OWOConnect(bool autoConnect, string suitIP)
     {
@@ -154,7 +169,7 @@ class Program
     {
         if (activatedMuscles.Count > 0)
         {
-            List<Muscle> updatedMuscles = new List<Muscle>();
+            List<Muscle> updatedMuscles = new();
 
             foreach (var muscle in activatedMuscles)
             {
@@ -206,37 +221,54 @@ class Program
 
             // Concatenate muscle information into a single string
             string musclesInfo = string.Join(",", musclesArray.Select(m => $"{MuslceName(m.id)}:{m.intensity}"));
-
-            // Print the muscle information
-            Console.WriteLine($"Muscles: {musclesInfo}");
+            if (oldMuscleInfo != musclesInfo)
+            {
+                muscleCounter = 1;
+                oldMuscleInfo = musclesInfo;
+                // Print the muscle information
+                Console.WriteLine($"Muscles: {musclesInfo}");
+            }
+            else
+            {
+                Console.Write($"\rEvent Counter: {muscleCounter}");
+                muscleCounter++;
+            }
+        }
+        else
+        {
+            if (oldMuscleInfo != "")
+            {
+                oldMuscleInfo = "";
+                muscleCounter = 0;
+            }
         }
     }
     // just for making the triggered muscles pretty in the console
     private static string MuslceName(int muscleID)
     {
-        switch (muscleID)
+        return muscleID switch
         {
-            case 0: // Pectoral_R
-                return "Pectoral_R";
-            case 1: // Pectoral_L
-                return "Pectoral_L";
-            case 2: // Abdominal_R
-                return "Abdominal_R";
-            case 3: // Abdominal_L
-                return "Abdominal_L";
-            case 4: // Arm_R
-                return "Arm_R";
-            case 5: // Arm_L
-                return "Arm_L";
-            case 6: // Dorsal_R
-                return "Dorsal_R";
-            case 7: // Dorsal_L
-                return "Dorsal_L";
-            case 8: // Lumbar_R
-                return "Lumbar_R";
-            case 9: // Lumbar_L
-                return "Lumbar_L";
-        }
-        return "Muslce ID Error";
+            // Pectoral_R
+            0 => "Pectoral_R",
+            // Pectoral_L
+            1 => "Pectoral_L",
+            // Abdominal_R
+            2 => "Abdominal_R",
+            // Abdominal_L
+            3 => "Abdominal_L",
+            // Arm_R
+            4 => "Arm_R",
+            // Arm_L
+            5 => "Arm_L",
+            // Dorsal_R
+            6 => "Dorsal_R",
+            // Dorsal_L
+            7 => "Dorsal_L",
+            // Lumbar_R
+            8 => "Lumbar_R",
+            // Lumbar_L
+            9 => "Lumbar_L",
+            _ => "Muslce ID Error",
+        };
     }
 }

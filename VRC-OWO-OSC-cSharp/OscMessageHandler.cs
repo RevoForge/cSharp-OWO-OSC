@@ -3,7 +3,7 @@
 public class OscMessageHandler
 {
     // Dictionary to map OSC addresses to boolean properties
-    private Dictionary<string, bool> oscAddressMap = new Dictionary<string, bool>();
+    private Dictionary<string, bool> oscAddressMap = new();
     public OscMessageHandler(List<Muscle> activatedMuscles)
     {
         // Initialize the mapping
@@ -55,10 +55,10 @@ public class OscMessageHandler
                 }
             }
             // Do something with the updated values, e.g., trigger events, update UI, etc.
-            Console.WriteLine($"Received: {OSCAddressCleanup(oscAddress)} {value}");
+            Console.WriteLine($"\nReceived: {OSCAddressCleanup(oscAddress)} {value}");
         }
     }
-    private string OSCAddressCleanup(string oscAddress)
+    private static string OSCAddressCleanup(string oscAddress)
     {
         string[] parts = oscAddress.Split('/');
         string result = parts[^1];
@@ -72,32 +72,21 @@ public class OscMessageHandler
     }
 
     // Helper method to get the Muscle instance from the OSC address
-    private Muscle GetMuscleFromOscAddress(string oscAddress)
+    private static Muscle GetMuscleFromOscAddress(string oscAddress)
     {
-        switch (oscAddress)
+        return oscAddress switch
         {
-            case "/avatar/parameters/owo_suit_Pectoral_R":
-                return Muscle.Pectoral_R;
-            case "/avatar/parameters/owo_suit_Pectoral_L":
-                return Muscle.Pectoral_L;
-            case "/avatar/parameters/owo_suit_Abdominal_R":
-                return Muscle.Abdominal_R;
-            case "/avatar/parameters/owo_suit_Abdominal_L":
-                return Muscle.Abdominal_L;
-            case "/avatar/parameters/owo_suit_Arm_R":
-                return Muscle.Arm_R;
-            case "/avatar/parameters/owo_suit_Arm_L":
-                return Muscle.Arm_L;
-            case "/avatar/parameters/owo_suit_Dorsal_R":
-                return Muscle.Dorsal_R;
-            case "/avatar/parameters/owo_suit_Dorsal_L":
-                return Muscle.Dorsal_L;
-            case "/avatar/parameters/owo_suit_Lumbar_R":
-                return Muscle.Lumbar_R;
-            case "/avatar/parameters/owo_suit_Lumbar_L":
-                return Muscle.Lumbar_L;
-            default:
-                return default;
-        }
+            "/avatar/parameters/owo_suit_Pectoral_R" => Muscle.Pectoral_R,
+            "/avatar/parameters/owo_suit_Pectoral_L" => Muscle.Pectoral_L,
+            "/avatar/parameters/owo_suit_Abdominal_R" => Muscle.Abdominal_R,
+            "/avatar/parameters/owo_suit_Abdominal_L" => Muscle.Abdominal_L,
+            "/avatar/parameters/owo_suit_Arm_R" => Muscle.Arm_R,
+            "/avatar/parameters/owo_suit_Arm_L" => Muscle.Arm_L,
+            "/avatar/parameters/owo_suit_Dorsal_R" => Muscle.Dorsal_R,
+            "/avatar/parameters/owo_suit_Dorsal_L" => Muscle.Dorsal_L,
+            "/avatar/parameters/owo_suit_Lumbar_R" => Muscle.Lumbar_R,
+            "/avatar/parameters/owo_suit_Lumbar_L" => Muscle.Lumbar_L,
+            _ => default,
+        };
     }
 }
