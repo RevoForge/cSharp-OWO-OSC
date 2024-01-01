@@ -98,18 +98,23 @@ class Program
                                     // do the stuff with owo suit bool parameters
                                     oscMessageHandler.HandleOscMessage(oscMessage.Address, (bool)oscMessage[i]);
                                 }
-                                else if (convertible.GetTypeCode() == TypeCode.Int32)
+                                else if (convertible.GetTypeCode() == TypeCode.Single)
                                 {
                                     if (oscMessage.Address.Contains("intensity"))
                                     {
                                         // Update the Intensity with a Parameter "owo_Intensity"
-                                        intensity = (int)oscMessage[i];
+
+                                        float intensityF = (float)oscMessage[i];
+                                        intensityF *= 100;
+                                        intensity = (int)intensityF;
                                         microSensation = SensationsFactory.Create(frequency, duration, intensity, rampUp, rampDown, 0);
                                     }
                                     if (oscMessage.Address.Contains("frequency"))
                                     {
                                         // Update the frequency with a Parameter "owo_frequency"
-                                        frequency = (int)oscMessage[i];
+                                        float frequencyF = (float)oscMessage[i];
+                                        frequencyF *= 100;
+                                        frequency = (int)frequencyF;
                                         microSensation = SensationsFactory.Create(frequency, duration, intensity, rampUp, rampDown, 0);
 
                                     }
